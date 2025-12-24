@@ -1,0 +1,42 @@
+​Assuma o papel de Engenheiro de Software Full-Stack (Python/SQL/JavaScript/Framework UI leve) e Arquiteto de Sistemas Contábeis Sênior. Sua missão é desenvolver o "Eagles", um sistema de BPO Financeiro modular e altamente intuitivo.
+​1. CONCEITO E IDENTIDADE:
+​Nome: Eagles.
+​Filosofia: Visão de águia (precisão, amplitude, decisão).
+​Identidade Visual: Design Dark Mode, minimalista, limpo, com linhas afiadas. Foco na clareza e redução da carga cognitiva. Cores sóbrias com destaques pontuais (Verde para positivo, Vermelho para alerta).
+​Tecnologia: Desenvolver como um PWA (Progressive Web App) único, responsivo e leve, otimizado para rodar em um Inspiron 15 (P39F) e em dispositivos mobile (iOS/Android).
+​2. ARQUITETURA DO SISTEMA:
+​Back-end: Python (Flask/Django leve) para API e lógica de negócios.
+​Banco de Dados: SQL (PostgreSQL ou SQLite para leveza).
+​Front-end: HTML/CSS/JavaScript com um framework UI leve (ex: Streamlit para prototipagem rápida ou React/Vue para PWA) que se adapte automaticamente (responsividade) ao dispositivo.
+​3. MÓDULO CONTADOR MASTER (Samuel - Desktop):
+​Dashboard Central: Visão holística de todos os clientes, com "Semáforo de Saúde Patrimonial" (Verde/Amarelo/Vermelho) personalizável por CNAE.
+​Importação Inteligente: Módulo Python/Pandas para leitura e processamento de:
+​XML (NF-e): Cadastro automático de produtos, extraindo Nome, Quantidade, Valor Unitário, Custo Médio Ponderado.
+​Planilhas de Estoque: Atualização de saldo e recálculo do Custo Médio Ponderado.
+​Balancetes (PDF/Excel): Extração de dados para o Dashboard, com ferramenta de "Lente do Contador".
+​Lente do Contador: Após importar o balancete, Samuel deve poder selecionar manualmente contas específicas, adicionando uma "Observação de Consultoria" contextualizada para o Dono.
+​Ferramentas de Auditoria: Log de todas as alterações feitas, e dashboard de "Saúde dos Dados" que monitora o desempenho do Gerente.
+​Aprovação: Todos os alertas críticos ou alterações de regime devem ser validados pelo Samuel antes de serem visíveis para o Dono.
+​4. MÓDULO SUPER GERENTE (Mobile):
+​Acesso por QR Code: O gerente autentica e acessa sua interface mobile através da leitura de um QR Code gerado pelo Samuel no painel.
+​Dashboard Operacional: Visualização rápida da escala do dia e status de presença da equipe.
+​Gestão de Pessoas (Simplificada): Funções de "Check-in" (presença), registro de faltas/atrasos (motivo: justificada/injustificada) e visualização da escala de trabalho do dia/semana. Sem folha de ponto eletrônica.
+​Input de Dados Rápido: Interface para registro de fechamento de caixa "cego" e captura de comprovantes de despesa via câmera do celular.
+​5. MÓDULO DONO (Mobile):
+​Acesso por QR Code: Autenticação e acesso via QR Code exclusivo.
+​Dashboard Estratégico: "Voo da Águia" com indicadores-chave:
+​Lucro Real (Competência vs. Caixa).
+​Ponto de Equilíbrio.
+​Margem de Contribuição.
+​"Semáforo de Saúde Patrimonial" (baseado nas metas definidas pelo Samuel).
+​"Lente do Contador": Visualização das contas destacadas com as observações do Samuel.
+​Alertas Contextuais: Recebe notificações do "Health Check" (desempenho do Gerente) e alertas financeiros validados pelo Samuel.
+​6. COMUNICAÇÃO INTEGRADA:
+​Sistema de mensagens diretas e contextualizadas:
+​Contador ↔ Dono (Consultoria e Alertas).
+​Contador ↔ Gerente (Dúvidas sobre lançamentos ou documentos).
+​7. REGRAS DE NEGÓCIO ESSENCIAIS:
+​Pro-labore Fixo: R$ 100,00 como despesa fixa padrão.
+​Configuração por CNAE: Adaptação automática de fórmulas e dashboards para diferentes tipos de negócio (ex: CMV para comércio, CPV para serviços, centros de custo para construtora).
+​TAREFA PRINCIPAL (Máximo de Saída):
+Gere a estrutura completa do Banco de Dados SQL (com tabelas, chaves primárias/estrangeiras, tipos de dados para todos os módulos descritos). Em seguida, forneça os scripts Python para as principais APIs (API de autenticação por QR Code, API de importação de XML/Planilha, API de registro de Presença/Faltas, API de Lente do Contador). Inclua também um wireframe textual/pseudo-código para a UI mobile do Gerente (tela de registro de presença) e do Dono (Dashboard estratégico) com a identidade "Eagles".
