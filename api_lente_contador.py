@@ -2,79 +2,81 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-# --- CONFIGURAÇÃO VISUAL EAGLES (Premium Dark Mode) ---
-st.set_page_config(page_title="EAGLES - BPO Estratégico", layout="wide")
+# --- CONFIGURAÇÃO ---
+st.set_page_config(page_title="EAGLES - Central de Inteligência", layout="wide")
 
+# --- ESTADO DO SISTEMA (SIMULANDO BANCO DE DADOS) ---
+if 'publicado_cliente' not in st.session_state:
+    st.session_state.publicado_cliente = False
+if 'dados_homologados' not in st.session_state:
+    st.session_state.dados_homologados = None
+
+# --- CSS DE ALTA LEGIBILIDADE ---
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; color: #ffffff; }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #262730; color: white; border: 1px solid #4a4a4a; }
-    .stButton>button:hover { border: 1px solid #00ffcc; color: #00ffcc; }
-    .sidebar .sidebar-content { background-image: linear-gradient(#2e7bcf,#2e7bcf); color: white; }
+    .stApp { background-color: #050b1a; color: #FFFFFF; }
+    .status-badge { padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+    .card-master { background-color: #0a1931; border: 1px solid #00d4ff; padding: 20px; border-radius: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SISTEMA DE IDENTIDADE MASTER ---
-# Aqui é onde você se identifica. Quando o login for "Samuel Richard", o menu de admin aparece.
-def verificar_permissoes(nome_usuario):
-    if nome_usuario == "Samuel Richard":
-        return "MASTER"
-    return "CONTADOR_PARCEIRO"
-
-# --- INTERFACE PRINCIPAL ---
-st.sidebar.title("🦅 EAGLES SYSTEM")
-usuario_logado = st.sidebar.text_input("Usuário", value="Samuel Richard") # Simulação de Login
-nivel_acesso = verificar_permissoes(usuario_logado)
-
-st.sidebar.write(f"Nível: **{nivel_acesso}**")
-st.sidebar.markdown("---")
-
-menu = ["Voo da Águia (Dashboard)", "Lente do Contador", "Gestão de Parceiros", "Configurações"]
-escolha = st.sidebar.selectbox("Navegação", menu)
-
-# --- ABA: GESTÃO DE PARCEIROS (Exclusivo para o Samuel) ---
-if escolha == "Gestão de Parceiros":
-    if nivel_acesso == "MASTER":
-        st.title("👥 Gestão de Contadores Parceiros")
-        st.subheader("Cadastre novos contadores para a rede Eagles")
+# --- FUNÇÃO DE PROCESSAMENTO AFIACO ---
+def processar_balancete(file, contas_alvo):
+    try:
+        df = pd.read_csv(file) # Pode ser expandido para Excel
+        # VALIDAÇÃO DE INTEGRIDADE (ERRO NÃO É BEM-VINDO)
+        colunas_necessarias = ['Conta', 'Descricao', 'Saldo_Atual']
+        if not all(c in df.columns for c in colunas_necessarias):
+            return None, "Erro: Layout do arquivo inválido. Colunas obrigatórias ausentes."
         
-        with st.form("form_novo_contador"):
-            col1, col2 = st.columns(2)
-            nome_novo = col1.text_input("Nome do Contador")
-            email_novo = col2.text_input("E-mail Profissional")
-            permissao = st.selectbox("Tipo de Acesso", ["Contador Pleno", "Contador Júnior"])
+        # BUSCA DAS CONTAS QUE VOCÊ PEDIR
+        df_filtrado = df[df['Conta'].astype(str).str.startswith(tuple(contas_alvo))]
+        return df_filtrado, "Sucesso"
+    except Exception as e:
+        return None, f"Erro Crítico no Processamento: {str(e)}"
+
+# --- INTERFACE MASTER ---
+st.sidebar.title("🦅 EAGLES MASTER")
+usuario = st.sidebar.text_input("Identidade", value="Samuel Richard")
+if usuario == "Samuel Richard":
+    menu = ["Radar de Importação", "Lente do Contador", "Publicações"]
+else:
+    menu = ["Lente do Contador"]
+escolha = st.sidebar.selectbox("Módulo", menu)
+
+# --- MÓDULO DE IMPORTAÇÃO ---
+if escolha == "Radar de Importação":
+    st.title("📥 Radar de Importação de Dados")
+    st.info("Configuração Afiada: O sistema busca contas específicas e aguarda seu comando para publicar.")
+
+    with st.container():
+        st.markdown('<div class="card-master">', unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("Carregar Balancete (CSV)", type="csv")
+        contas_input = st.text_input("IDs das Contas Alvo (Ex: 1.1.01, 1.1.05)", "1.1")
+        
+        if uploaded_file is not None:
+            contas_alvo = [c.strip() for c in contas_input.split(",")]
+            dados, mensagem = processar_balancete(uploaded_file, contas_alvo)
             
-            btn_cadastrar = st.form_submit_button("Liberar Acesso")
-            if btn_cadastrar:
-                st.success(f"Acesso liberado para {nome_novo}! Ele agora pode cadastrar empresas.")
-    else:
-        st.error("Acesso Negado. Apenas o Master (Samuel) pode gerenciar parceiros.")
+            if dados is not None:
+                st.success(mensagem)
+                st.session_state.dados_homologados = dados
+                st.subheader("Visualização Prévia (Homologação Master)")
+                st.dataframe(dados, use_container_width=True)
+                
+                if st.button("🚀 COMANDAR PUBLICAÇÃO PARA O CLIENTE"):
+                    st.session_state.publicado_cliente = True
+                    st.balloons()
+                    st.success("Dados publicados na Lente do Cliente com sucesso.")
+            else:
+                st.error(mensagem)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-# --- ABA: VOO DA ÁGUIA (Visão do Dono com seu Pro-labore) ---
-elif escolha == "Voo da Águia (Dashboard)":
-    st.title("🦅 Voo da Águia - Dashboard Estratégico")
-    
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Ponto de Equilíbrio", "R$ 15.400,00", "+2%")
-    col2.metric("Seu Pro-labore", "R$ 100,00", "Fixado")
-    col3.metric("Lucro Alquímico", "R$ 4.250,00", "Saudável")
-
-    st.markdown("### 🔍 Observações da Lente do Contador")
-    st.info("⚠️ **Conta: Fornecedores** - Samuel Richard observou um aumento de 15% nos custos. Sugerimos renegociar o prazo.")
-
-# --- ABA: LENTE DO CONTADOR (Operação) ---
+# --- MÓDULO LENTE (O QUE O CLIENTE VÊ) ---
 elif escolha == "Lente do Contador":
-    st.title("🔍 A Lente do Contador")
-    st.write("Selecione um lançamento para inserir sua observação estratégica.")
-    
-    # Simulação de dados que vêm do seu SQL
-    dados_balancete = pd.DataFrame({
-        'Conta': ['Energia Elétrica', 'Pro-labore', 'Estoque de Peças'],
-        'Valor': [1200, 100, 5500],
-        'Status': ['Analisado', 'Ok', 'Pendente']
-    })
-    
-    st.table(dados_balancete)
-    observacao = st.text_area("Insira sua análise para o Dono ver:")
-    if st.button("Publicar na Visão do Dono"):
-        st.success("Observação enviada para o Dashboard!")
+    st.title("🔍 Lente do Contador")
+    if st.session_state.publicado_cliente:
+        st.write("### Dados Oficiais Publicados")
+        st.dataframe(st.session_state.dados_homologados)
+    else:
+        st.warning("Aguardando publicação dos dados pelo Diretor Master.")
